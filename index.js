@@ -49,6 +49,7 @@ function viewAllEmployees() {
         for (let i = 0; i < rows.length; i++) {
             if (rows[i].manager_id == null) {
                 rows[i].manager = 'No manager';
+                console.log(rows[i].manager_id);
             }
             else {
                 rows[i].manager = rows[rows[i].manager_id - 1].first_name + ' ' + rows[rows[i].manager_id - 1].last_name;
