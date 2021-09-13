@@ -1,6 +1,18 @@
 const inquirer = require('inquirer');
-const mysql2 = require('mysql2');
+const mysql = require('mysql2');
 const cTable = require('console.table');
+
+const db = mysql.createConnection(
+    {
+      host: 'localhost',
+      user: 'root',
+      password: '',
+      database: 'employee_db'
+    },
+    console.log(`Connected database.`)
+  );
+  
+
 
 /* 
 
@@ -17,8 +29,35 @@ TO DO:
 runApp();
 
 function runApp() {
-    showTable();
+    //showTable();
     initMenu();
+};
+
+function viewAllEmployees() {
+    const sql = `SELECT employee.id, employee.first_name, employee.last_name,
+    roles.title, department.department_name, r2.salary, employee.manager_id
+    FROM employee
+    INNER JOIN roles
+    ON employee.role_id = roles.id
+    INNER JOIN roles r2
+    ON roles.salary = r2.salary
+    INNER JOIN department
+    ON roles.department_id = department.id
+    ORDER BY employee.id ASC`;
+    db.query(sql, (err, rows) => {
+        if(err) throw err;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].manager_id == null) {
+                rows[i].manager = 'No manager';
+            }
+            else {
+                rows[i].manager = rows[rows[i].manager_id - 1].first_name + ' ' + rows[rows[i].manager_id - 1].last_name;
+            }
+        }
+        //console.log(rows);
+        console.table(rows);
+        initMenu();
+    })
 };
 
 function showTable() {
@@ -60,7 +99,7 @@ function initMenu() {
             }])
             .then(function({mainMenu}) {
                 if (mainMenu === 'View All Employees') {
-                    // show all employees
+                    viewAllEmployees();
                 } else if (mainMenu === 'View All Employees By Department') {
                     // show all employees with department data
                 } else if (mainMenu === 'View All Employees By Manager') {
