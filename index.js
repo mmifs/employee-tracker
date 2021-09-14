@@ -105,6 +105,30 @@ function addDepartment() {
         })
 };
 
+function addRole() {
+    const sql1 = `SELECT department_name FROM department`;
+
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'roleName',
+                message: 'What is the name of the new role?'
+            },
+            {
+                type: 'input',
+                name: 'roleID',
+                message: 'Please enter the new role ID, it MUST be different from existing role IDs'
+            },
+            {
+                type: 'list',
+                name: 'departmentID',
+                message: 'What department does this role belong to?',
+                choices: ['']
+            }
+        ])
+}
+
 function showTable() {
 
     // use console.table in conjunction with sql to display data
@@ -133,10 +157,10 @@ function initMenu() {
                     'View All Roles',
                     'View All Employees',  
                     'Add Department', 
+                    'Add Role', 
                     'Remove Employee', 
                     'Update Employee Role', 
                     'Update Employee Manager', 
-                    'Add Role', 
                     'Remove Role'
                 ],
                 message: 'What would you like to do?'
@@ -150,6 +174,8 @@ function initMenu() {
                     viewAllEmployees();
                 } else if (mainMenu === 'Add Department') {
                     addDepartment();
+                } else if (mainMenu === 'Add Role') {
+                    // addRole();
                 } else if (mainMenu === 'Remove Employee') {
                     // remove employee from table
                 } else if (mainMenu === 'Update Employee Role') {
@@ -158,8 +184,6 @@ function initMenu() {
                     // change employee manager
                 } else if (mainMenu === 'View All Roles') {
                     // show all roles only
-                } else if (mainMenu === 'Add Role') {
-                    // add new role, roles must concatenate with script in order for this to be fluid
                 } else {
                     // remove role, must also concatenate
                 }
