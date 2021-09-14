@@ -84,6 +84,27 @@ function viewAllRoles() {
     })
 };
 
+function addDepartment() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'depName',
+                message: 'What is the name of the new department?'
+            }])
+        .then(function({depName}) {
+            console.log(depName);
+            const sql = `INSERT INTO department (department_name)
+            VALUES
+                ('${depName}')`;
+                db.query(sql, (err, rows) => {
+                    if(err) throw err;
+                })
+                initMenu();
+
+        })
+};
+
 function showTable() {
 
     // use console.table in conjunction with sql to display data
@@ -128,7 +149,7 @@ function initMenu() {
                 } else if (mainMenu === 'View All Employees') {
                     viewAllEmployees();
                 } else if (mainMenu === 'Add Department') {
-                    // add employee to table
+                    addDepartment();
                 } else if (mainMenu === 'Remove Employee') {
                     // remove employee from table
                 } else if (mainMenu === 'Update Employee Role') {
