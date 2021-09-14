@@ -60,6 +60,30 @@ function viewAllEmployees() {
     })
 };
 
+function viewAllDepartments() {
+    const sql = `SELECT department.id, department.department_name
+    FROM department
+    ORDER BY department.id ASC`;
+    db.query(sql, (err, rows) => {
+        if(err) throw err;
+        console.table(rows);
+        initMenu();
+    })
+};
+
+function viewAllRoles() {
+    const sql = `SELECT roles.title, roles.id, department.department_name, roles.salary
+    FROM roles
+    INNER JOIN department
+    ON roles.department_id = department.id
+    ORDER BY roles.id ASC`;
+    db.query(sql, (err, rows) => {
+        if(err) throw err;
+        console.table(rows);
+        initMenu();
+    })
+};
+
 function showTable() {
 
     // use console.table in conjunction with sql to display data
@@ -84,27 +108,26 @@ function initMenu() {
                 type: 'list',
                 name:'mainMenu',
                 choices: [
-                    'View All Employees', 
-                    'View All Employees By Department', 
-                    'View All Employees By Manager', 
-                    'Add Employee', 
+                    'View All Departments',
+                    'View All Roles',
+                    'View All Employees',  
+                    'Add Department', 
                     'Remove Employee', 
                     'Update Employee Role', 
                     'Update Employee Manager', 
-                    'View All Roles', 
                     'Add Role', 
                     'Remove Role'
                 ],
                 message: 'What would you like to do?'
             }])
             .then(function({mainMenu}) {
-                if (mainMenu === 'View All Employees') {
+                if (mainMenu === 'View All Departments') {
+                    viewAllDepartments();
+                } else if (mainMenu === 'View All Roles') {
+                    viewAllRoles();
+                } else if (mainMenu === 'View All Employees') {
                     viewAllEmployees();
-                } else if (mainMenu === 'View All Employees By Department') {
-                    // show all employees with department data
-                } else if (mainMenu === 'View All Employees By Manager') {
-                    // show all employees with manager data
-                } else if (mainMenu === 'Add Employee') {
+                } else if (mainMenu === 'Add Department') {
                     // add employee to table
                 } else if (mainMenu === 'Remove Employee') {
                     // remove employee from table
