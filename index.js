@@ -75,7 +75,7 @@ function viewAllRoles() {
     const sql = `SELECT roles.title, roles.id, department.department_name, roles.salary
     FROM roles
     INNER JOIN department
-    ON roles.department_id = department.id
+    ON roles.department_id = department.id 
     ORDER BY roles.id ASC`;
     db.query(sql, (err, rows) => {
         if(err) throw err;
@@ -93,7 +93,6 @@ function addDepartment() {
                 message: 'What is the name of the new department?'
             }])
         .then(function({depName}) {
-            console.log(depName);
             const sql = `INSERT INTO department (department_name)
             VALUES
                 ('${depName}')`;
@@ -106,7 +105,13 @@ function addDepartment() {
 };
 
 function addRole() {
-    const sql1 = `SELECT department_name FROM department`;
+    const existingDep = `SELECT department.id, department.department_name FROM department`;
+    /*db.query(existingDep, (err, rows) => {
+        if(err) throw err;
+        for (let i = 0; i < rows.length; i++) {
+            console.log(rows.map(({ department_name, id }) => ({ name: department_name, value: id})));
+        }
+    })*/
 
     inquirer
         .prompt([
@@ -117,17 +122,39 @@ function addRole() {
             },
             {
                 type: 'input',
-                name: 'roleID',
-                message: 'Please enter the new role ID, it MUST be different from existing role IDs'
-            },
-            {
-                type: 'list',
-                name: 'departmentID',
-                message: 'What department does this role belong to?',
-                choices: ['']
+                name: 'roleSalary',
+                message: "Please enter the new role's salary, enter numbers only"
             }
         ])
+        .then(function({roleName, roleSalary}) {
+            const existingDep = `SELECT department.id, department.department_name FROM department`;
+            db.query(existingDep, (err, rows) => {
+                if(err) throw err;
+                let getDeps = rows.map(({ department_name, id }) => ({ name: department_name, value: id}));
+                inquirer
+                    .prompt([
+                        {
+                            type:'list',
+                            name: 'roleDepartment',
+                            message: 'Choose a department for the new role',
+                            choices: getDeps
+                        }
+                    ])
+                    .then(function({roleDepartment}) {
+
+                        const sql = `INSERT INTO roles (title, salary, department_id)
+                        VALUES 
+                        ('${roleName}', ${roleSalary}, ${roleDepartment})`;
+                        db.query(sql, (err, foo) => {
+                            if(err) throw err;
+                            });
+                        console.log(`${roleName} added to roles table`);
+                        viewAllRoles();
+                    })
+            })
+        })
 }
+
 
 function showTable() {
 
@@ -175,7 +202,7 @@ function initMenu() {
                 } else if (mainMenu === 'Add Department') {
                     addDepartment();
                 } else if (mainMenu === 'Add Role') {
-                    // addRole();
+                    addRole();
                 } else if (mainMenu === 'Remove Employee') {
                     // remove employee from table
                 } else if (mainMenu === 'Update Employee Role') {
