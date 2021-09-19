@@ -34,16 +34,16 @@ function runApp() {
 };
 
 function viewAllEmployees() {
-    const sql = `SELECT employee.id, employee.first_name, employee.last_name,
+    const sql = `SELECT employee.employid, employee.first_name, employee.last_name,
     roles.title, department.department_name, r2.salary, employee.manager_id
     FROM employee
     INNER JOIN roles
-    ON employee.role_id = roles.id
+    ON employee.role_id = roles.roleid
     INNER JOIN roles r2
     ON roles.salary = r2.salary
     INNER JOIN department
     ON roles.department_id = department.id
-    ORDER BY employee.id ASC`;
+    ORDER BY employee.employid ASC`;
     db.query(sql, (err, rows) => {
         if(err) throw err;
         for (let i = 0; i < rows.length; i++) {
@@ -72,11 +72,11 @@ function viewAllDepartments() {
 };
 
 function viewAllRoles() {
-    const sql = `SELECT roles.title, roles.id, department.department_name, roles.salary
+    const sql = `SELECT roles.title, roles.roleid, department.department_name, roles.salary
     FROM roles
     INNER JOIN department
     ON roles.department_id = department.id 
-    ORDER BY roles.id ASC`;
+    ORDER BY roles.roleid ASC`;
     db.query(sql, (err, rows) => {
         if(err) throw err;
         console.table(rows);
@@ -155,6 +155,65 @@ function addRole() {
         })
 }
 
+function addEmp() {
+    inquirer
+        .prompt([
+            {
+                type: 'input',
+                name: 'empFirstName',
+                message: "What is the new employee's first name?"
+            },
+            {
+                type: 'input',
+                name: 'empLastName',
+                message: "What is the new employee's last name?"
+            }
+        ])
+        .then(function({empFirstName, empLastName}) {
+            const existingRoles = `SELECT roles.roleid, roles.title FROM roles`;
+            db.query(existingRoles, (err, rows) => {
+                if(err) throw err;
+                let getRoles = rows.map(({ roleid, title }) => ({ name: title, value: roleid}));
+                inquirer
+                    .prompt([
+                        {
+                            type: 'list',
+                            name: 'roleChoice',
+                            message: 'Choose a role for the new employee',
+                            choices: getRoles
+                        }
+                    ])
+                    .then(function({roleChoice}) {
+                        console.log(roleChoice);
+                        const existingEmps = `SELECT first_name, last_name, employid FROM employee`;
+                        db.query(existingEmps, (err, rows2) => {
+                            if(err) throw err;
+                            let getEmps = rows2.map(({ first_name, last_name, employid }) => ({ name: first_name + ' ' + last_name, value: employid}));
+                            inquirer
+                                .prompt([
+                                    {
+                                        type: 'list',
+                                        name: 'manChoice',
+                                        message: 'Choose a manager for a new employee',
+                                        choices: getEmps
+                                    }
+                                ])
+                                .then(function({manChoice}) {
+                                    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                    VALUES
+                                        ('${empFirstName}', '${empLastName}', ${roleChoice}, ${manChoice})`;
+                                        db.query(sql, (err, foo) => {
+                                            if(err) throw err;
+                                        });
+                                        console.log(`${empFirstName} ${empLastName} added to employee table`);
+                                        viewAllEmployees();
+                                })
+                        })
+                    })
+            })
+        })
+}
+
 
 function showTable() {
 
@@ -185,10 +244,8 @@ function initMenu() {
                     'View All Employees',  
                     'Add Department', 
                     'Add Role', 
-                    'Remove Employee', 
-                    'Update Employee Role', 
-                    'Update Employee Manager', 
-                    'Remove Role'
+                    'Add Employee', 
+                    'Update Employee Role'
                 ],
                 message: 'What would you like to do?'
             }])
@@ -203,16 +260,10 @@ function initMenu() {
                     addDepartment();
                 } else if (mainMenu === 'Add Role') {
                     addRole();
-                } else if (mainMenu === 'Remove Employee') {
-                    // remove employee from table
-                } else if (mainMenu === 'Update Employee Role') {
-                    // change employee role
-                } else if (mainMenu === 'Update Employee Manager') {
-                    // change employee manager
-                } else if (mainMenu === 'View All Roles') {
-                    // show all roles only
+                } else if (mainMenu === 'Add Employee') {
+                    addEmp();
                 } else {
-                    // remove role, must also concatenate
+                    // updateRole();
                 }
             });
 };
