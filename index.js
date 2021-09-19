@@ -29,7 +29,7 @@ TO DO:
 runApp();
 
 function runApp() {
-    //showTable();
+    viewAllEmployees();
     initMenu();
 };
 
@@ -215,22 +215,46 @@ function addEmp() {
 }
 
 
-function showTable() {
+function updateRole() {
+    const existingEmps = `SELECT employid, first_name, last_name, role_id, role_title FROM employee
+    FROM roles
+    INNER JOIN role_id
+    ON roles.roleid = role_id
+    INNER JOIN role_title
+    FROM roles.title = role_title
+    ORDER BY employee.employid ASC`;
+    db.query(existingEmps, (err, rows) => {
+        if(err) throw err;
+        let getEmps = rows.map(({ first_name, last_name, employid }) => ({ name: first_name + ' ' + last_name, value: employid}));
+        let getRoles = rows.map(({ roleid, title }) => ({ name: title, value: roleid }));
+        inquirer
+            .prompt([
+                {
+                    type: 'list',
+                    name: 'empChoice',
+                    message: "What employee's role is getting updated?",
+                    choices: getEmps
+                },
+                {
+                    type: 'list',
+                    name: 'roleChoice',
+                    message: 'What role would you like this employee to have?',
+                    choices: getRoles
+                }
+            ])
+            .then(function({empChoice, roleChoice}) {
+                const sql = `UPDATE employee SET role_id = ${roleChoice} WHERE employid = ${empChoice}`;
+                db.query(sql, (err, rows) => {
+                    if (err) throw err;
+                    console.log('Employee role updated');
+                    viewAllEmployees();
+                    initMenu();
+                })
 
-    // use console.table in conjunction with sql to display data
-
-    // the following commented code confirms that console.table works
-
-    /*console.table([
-        {
-          name: 'foo',
-          age: 10
-        }, {
-          name: 'bar',
-          age: 20
+            })
         }
-      ]);*/
 }
+
 
 function initMenu() {
     inquirer
@@ -263,7 +287,7 @@ function initMenu() {
                 } else if (mainMenu === 'Add Employee') {
                     addEmp();
                 } else {
-                    // updateRole();
+                    updateRole();
                 }
             });
 };
