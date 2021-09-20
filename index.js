@@ -28,27 +28,16 @@ const db = mysql.createConnection(
   );
   
 
-
-/* 
-
-TO DO:
-1. create working menu
-2. create schema file for sql
-3. create seeds file for placeholder data
-4. concatenate sql data with menu
-    - show all data
-    - change data with menu selections
-    
-*/
-
 runApp();
 
 function runApp() {
+    console.log('\n');
     viewAllEmployees();
     initMenu();
 };
 
 function viewAllEmployees() {
+    console.log('\n');
     const sql = `SELECT employee.employid, employee.first_name, employee.last_name,
     roles.title, department.department_name, r2.salary, employee.manager_id
     FROM employee
@@ -76,6 +65,7 @@ function viewAllEmployees() {
 };
 
 function viewAllDepartments() {
+    console.log('\n');
     const sql = `SELECT department.id, department.department_name
     FROM department
     ORDER BY department.id ASC`;
@@ -87,6 +77,7 @@ function viewAllDepartments() {
 };
 
 function viewAllRoles() {
+    console.log('\n');
     const sql = `SELECT roles.title, roles.roleid, department.department_name, roles.salary
     FROM roles
     INNER JOIN department
@@ -100,6 +91,7 @@ function viewAllRoles() {
 };
 
 function addDepartment() {
+    console.log('\n');
     inquirer
         .prompt([
             {
@@ -120,14 +112,7 @@ function addDepartment() {
 };
 
 function addRole() {
-    const existingDep = `SELECT department.id, department.department_name FROM department`;
-    /*db.query(existingDep, (err, rows) => {
-        if(err) throw err;
-        for (let i = 0; i < rows.length; i++) {
-            console.log(rows.map(({ department_name, id }) => ({ name: department_name, value: id})));
-        }
-    })*/
-
+    console.log('\n');
     inquirer
         .prompt([
             {
@@ -171,6 +156,7 @@ function addRole() {
 }
 
 function addEmp() {
+    console.log('\n');
     inquirer
         .prompt([
             {
@@ -231,6 +217,7 @@ function addEmp() {
 
 
 function updateRole() {
+    console.log('\n');
     const existingEmps = `SELECT employid, first_name, last_name, role_id, roles.title
     FROM employee
     INNER JOIN roles
