@@ -1,14 +1,29 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 const cTable = require('console.table');
+const fs = require('fs');
+const { exit } = require('process');
+let rawdata = fs.readFileSync('.env')
 
+const config = JSON.parse(rawdata);
+if (config.host == null) {
+    console.log('Error, missing host');
+    exit(1);
+}
+if (config.user == null) {
+    console.log('Error, missing user');
+    exit(1);
+}
+if (config.password == null) {
+    console.log('Error, missing password');
+    exit(1);
+}
+if (config.database == null) {
+    console.log('Error, missing database');
+    exit(1);
+}
 const db = mysql.createConnection(
-    {
-      host: 'localhost',
-      user: 'root',
-      password: '',
-      database: 'employee_db'
-    },
+    config,
     console.log(`Connected database.`)
   );
   
@@ -216,17 +231,15 @@ function addEmp() {
 
 
 function updateRole() {
-    const existingEmps = `SELECT employid, first_name, last_name, role_id, role_title FROM employee
-    FROM roles
-    INNER JOIN role_id
+    const existingEmps = `SELECT employid, first_name, last_name, role_id, roles.title
+    FROM employee
+    INNER JOIN roles
     ON roles.roleid = role_id
-    INNER JOIN role_title
-    FROM roles.title = role_title
     ORDER BY employee.employid ASC`;
     db.query(existingEmps, (err, rows) => {
         if(err) throw err;
         let getEmps = rows.map(({ first_name, last_name, employid }) => ({ name: first_name + ' ' + last_name, value: employid}));
-        let getRoles = rows.map(({ roleid, title }) => ({ name: title, value: roleid }));
+        let getRoles = rows.map(({ role_id, title }) => ({ name: title, value: role_id }));
         inquirer
             .prompt([
                 {
@@ -252,11 +265,12 @@ function updateRole() {
                 })
 
             })
-        }
+    })
 }
 
 
 function initMenu() {
+    console.log('\n')
     inquirer
         .prompt([
             {
