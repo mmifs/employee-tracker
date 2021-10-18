@@ -33,7 +33,6 @@ runApp();
 function runApp() {
     console.log('\n');
     viewAllEmployees();
-    initMenu();
 };
 
 function viewAllEmployees() {
