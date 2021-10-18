@@ -10,6 +10,7 @@ This application has the ability to manage a database of employees including the
 * [Installation](#installation)
 * [Usage](#usage)
 * [License](#license)
+* [Walkthrough](#walkthrough)
 * [Questions](#questions)
 
 
@@ -27,6 +28,11 @@ To launch the application, enter node index.js in the terminal and select the pr
 
 This project is protected by an MIT license. For more information, please contact the author.
 
+## Walkthrough
+
+https://drive.google.com/file/d/1hz-_KFwZyTB9XZ2RzVn3M7wAvSbcFbO-/view
+
+https://user-images.githubusercontent.com/85654339/137777464-2b342005-1cdf-4187-bd82-41bcda64709a.mov
 
 ## Questions
 
